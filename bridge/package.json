@@ -1,0 +1,1 @@
+{"dependencies":{"playwright-core":"^1.49.0"},"description":"Run a real browser on your own machine and drive it remotely over Tailscale.","name":"home-browser-bridge","private":true,"scripts":{"start":"node server.mjs"},"type":"module","version":"0.1.0"}
