@@ -9,6 +9,11 @@ const HOST = process.env.BRIDGE_HOST || '100.102.34.34';
 const PORT = Number(process.env.BRIDGE_PORT || 8787);
 const PROFILE_DIR = process.env.BRIDGE_PROFILE || `${process.env.HOME}/.config/home-browser-bridge/profile`;
 const CHROME_PATH = process.env.BRIDGE_CHROME || '/usr/bin/google-chrome-stable';
+// Headed mode looks like a real person using the browser, which is the
+// strongest single anti-detection lever, but it needs a display and pops a
+// window up on your screen. Default stays headless; set BRIDGE_HEADED=1 to
+// run headed.
+const HEADED = process.env.BRIDGE_HEADED === '1';
 
 let context;
 let page;
@@ -17,8 +22,13 @@ async function ensureBrowser() {
   if (page) return page;
   context = await chromium.launchPersistentContext(PROFILE_DIR, {
     executablePath: CHROME_PATH,
-    headless: true,
-    args: ['--no-sandbox'],
+    headless: !HEADED,
+    args: [
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      // Removes the navigator.webdriver flag, the most obvious automation tell.
+      '--disable-blink-features=AutomationControlled',
+    ],
   });
   page = context.pages()[0] || (await context.newPage());
   return page;

@@ -49,9 +49,18 @@ never completes a purchase on its own.
 
 - **M1: prove the path.** SSH from the agent VM to the laptop works; Playwright
   + Chromium run on the laptop; the bridge loads papajohns.com and sign-in
-  works from the home IP.
-- **M2: first real order.** The Papa Johns order that started this project,
-  placed through the bridge with human confirmation.
+  works from the home IP. **Done Nov 18, 2026:** the bridge runs on the laptop
+  and, driven from the agent VM over the tailnet, loaded papajohns.com with its
+  real title. Papa Johns was then dropped as a target (Brandon tried ordering
+  on his own and got a generic rejection, so it was not a clean test).
+- **M2: clear a site that blocks automation.** Reddit is the current test: it
+  normally blocks datacenter IPs, and it also fingerprints automated browsers.
+  The home IP alone did not clear it (Nov 18: reddit.com showed "Prove your
+  humanity", old.reddit.com bounced to login, both anonymous, fresh profile).
+  Current approach: reduce automation tells (disable the webdriver flag) and
+  offer a headed mode (`BRIDGE_HEADED=1`) that looks like a real person using
+  the browser. Anti-detection is a moving target; no guarantee Reddit stays
+  cleared.
 - **M3: usable by others.** README, setup script, and enough docs that someone
   else can run it without asking us questions.
 
@@ -59,12 +68,19 @@ never completes a purchase on its own.
 
 - Cloud-browser sign-in to Papa Johns fails with a generic "an error occurred"
   for both the saved login and the account owner typing it himself. The site
-  never says the password is wrong.
-- The laptop (`brandons-linux-acer-neo`) is on the tailnet and answers TCP on
-  port 22, but no SSH banner comes back yet, so SSH server status is still
-  unconfirmed.
+  never says the password is wrong. (Papa Johns later dropped as a target;
+  Brandon's own order attempt was also rejected with a generic error.)
+- The laptop (`brandons-linux-acer-neo`, CachyOS) is on the tailnet and runs
+  openssh-server, Node 22, Python 3, and Google Chrome. SSH from the agent VM
+  works with a key, but the tunnel proxy is flaky: file-transfer and install
+  commands over SSH (`git clone`, `npm install`, `scp`) repeatedly fail at the
+  CONNECT stage while short read-only commands go through. Setup steps on the
+  laptop are done by hand for now.
 - The agent's browser tasks cannot route through a proxy, and its built-in
   Tailscale client does not support exit nodes.
+- The bridge (Node + Playwright + system Chrome, tailnet-only HTTP on port
+  8787) runs on the laptop and answers from the agent VM. It loaded
+  papajohns.com and reddit.com from the home IP.
 
 ## Open questions
 
