@@ -3,7 +3,10 @@
 // a tiny HTTP API on the tailnet IP only. The agent sends actions; the bridge
 // drives the browser. No credentials ever leave this machine.
 import http from 'node:http';
-import { chromium } from 'playwright-core';
+// Patchright is a drop-in Playwright fork that patches the automation
+// fingerprints at the CDP layer (notably the Runtime.enable leak), which
+// plain JS stealth injection cannot fix. Same API as Playwright.
+import { chromium } from 'patchright';
 
 const HOST = process.env.BRIDGE_HOST || '100.102.34.34';
 const PORT = Number(process.env.BRIDGE_PORT || 8787);
